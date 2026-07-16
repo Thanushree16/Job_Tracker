@@ -52,24 +52,29 @@ function PasteToTrack() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <label htmlFor="jdText" className="text-zinc-500 text-sm">
-          Paste Job Description
+    <div className="max-w-2xl mx-auto w-full p-6 flex flex-col gap-6">
+      <div>
+        <h1 className="text-white text-xl font-semibold mb-1">Paste to Track</h1>
+        <p className="text-zinc-500 text-sm">Paste a job description and we'll extract the details automatically.</p>
+      </div>
+      <div className="flex flex-col gap-3">
+        <label htmlFor="jdText" className="text-zinc-400 text-sm font-medium">
+          Job Description
         </label>
         <textarea
           id="jdText"
-          className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          rows="10"
+          className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          rows="12"
+          placeholder="Paste the full job description here..."
           value={jdText}
           onChange={(e) => setJdText(e.target.value)}
         ></textarea>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           onClick={handleTrack}
           disabled={loading || jdText.trim() === ""}
         >
-          {loading ? "Submitting..." : "Submit"}
+          {loading ? "Tracking..." : "Track Job"}
         </button>
       </div>
     </div>

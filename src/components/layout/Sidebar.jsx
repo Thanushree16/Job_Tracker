@@ -35,14 +35,14 @@ function Sidebar() {
               Paste to Track
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/resume"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors"
             >
               Resume Optimizer
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/profile"
