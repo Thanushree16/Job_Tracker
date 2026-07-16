@@ -4,45 +4,54 @@ import PasteToTrack from "./pages/PasteToTrack";
 import ResumeOptimizer from "./pages/ResumeOptimizer";
 import Profile from "./pages/Profile";
 import Appshell from "./components/layout/Appshell";
+import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Router>
-    
-
       <Routes>
         <Route
           path="/"
           element={
-            <Appshell>
-              <Dashboard />
-            </Appshell>
+            <ProtectedRoute>
+              <Appshell>
+                <Dashboard />
+              </Appshell>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/paste"
           element={
-            <Appshell>
-              <PasteToTrack />
-            </Appshell>
+            <ProtectedRoute>
+              <Appshell>
+                <PasteToTrack />
+              </Appshell>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/resume"
           element={
-            <Appshell>
-              <ResumeOptimizer />
-            </Appshell>
+            <ProtectedRoute>
+              <Appshell>
+                <ResumeOptimizer />
+              </Appshell>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            <Appshell>
-              <Profile />
-            </Appshell>
+            <ProtectedRoute>
+              <Appshell>
+                <Profile />
+              </Appshell>
+            </ProtectedRoute>
           }
         />
+        <Route path="/auth" element={<Auth />} />
       </Routes>
     </Router>
   );
