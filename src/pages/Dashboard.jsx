@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useJobs } from "../hooks/useJobs.js";
 import EditJobModal from "./EditJobModal.jsx";
+import AddJobModal from "./AddJobModal.jsx";
 
 const STATUS_OPTIONS = [
   { value: "applied", label: "Applied" },
@@ -11,8 +12,9 @@ const STATUS_OPTIONS = [
 ];
 
 function Dashboard() {
-  const { jobs, loading, updateJob, deleteJob } = useJobs();
+  const { jobs, loading, updateJob, deleteJob, addJob } = useJobs();
   const [editingJob, setEditingJob] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [updatingStatusId, setUpdatingStatusId] = useState(null);
 
@@ -76,7 +78,17 @@ function Dashboard() {
         </div>
       </div>
 
-      <table className="w-full text-left text-white mt-6 border-collapse">
+      <div className="flex items-center justify-between mt-8 mb-2">
+        <h2 className="text-white text-lg font-semibold">Applications</h2>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition flex items-center gap-2"
+        >
+          <span className="text-lg leading-none">+</span> Add Job
+        </button>
+      </div>
+
+      <table className="w-full text-left text-white mt-2 border-collapse">
         <thead className="border-b border-zinc-800">
           <tr>
             <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Sno</th>
@@ -162,6 +174,13 @@ function Dashboard() {
           job={editingJob}
           onClose={() => setEditingJob(null)}
           onSave={updateJob}
+        />
+      )}
+
+      {showAddModal && (
+        <AddJobModal
+          onClose={() => setShowAddModal(false)}
+          onSave={addJob}
         />
       )}
     </div>

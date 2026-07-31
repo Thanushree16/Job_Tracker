@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Job Tracker Auto-Capture",
+  "version": "1.0",
+  "description": "Detects when you apply to a job and saves it to your Job Tracker automatically",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://rhggassmooplumabxpbn.supabase.co/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://job-tracker-sigma-indol.vercel.app/*"],
+      "js": ["auth-sync.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["https://job-tracker-sigma-indol.vercel.app/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Job Tracker"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
