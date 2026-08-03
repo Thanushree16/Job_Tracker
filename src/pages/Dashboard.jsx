@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useJobs } from "../hooks/useJobs.js";
 import EditJobModal from "./EditJobModal.jsx";
 import AddJobModal from "./AddJobModal.jsx";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 
 const STATUS_OPTIONS = [
   { value: "applied", label: "Applied" },
@@ -10,6 +11,25 @@ const STATUS_OPTIONS = [
   { value: "rejected", label: "Rejected" },
   { value: "no_response", label: "No Response" },
 ];
+
+// Full literal class strings (not built dynamically) so Tailwind's compiler
+// can actually detect and include them in the build.
+const STATUS_STYLES = {
+  applied: "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
+  interview: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-900",
+  offer: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900",
+  rejected: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
+  no_response: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900",
+};
+
+function CompanyAvatar({ name }) {
+  const initial = (name || "?").trim().charAt(0).toUpperCase() || "?";
+  return (
+    <div className="w-7 h-7 rounded-full bg-slate-900 dark:bg-slate-700 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0">
+      {initial}
+    </div>
+  );
+}
 
 function Dashboard() {
   const { jobs, loading, updateJob, deleteJob, addJob } = useJobs();
@@ -44,145 +64,172 @@ function Dashboard() {
   };
 
   return (
-    <div className="p-6">
-      <div className="grid grid-cols-5 gap-4">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">
-            Total Applied
-          </p>
-          <h3 className="text-white text-3xl font-bold">{jobs.length}</h3>
-        </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">
-            Interviews
-          </p>
-          <h3 className="text-white text-3xl font-bold">{jobs.filter(j => j.status === 'interview').length}</h3>
-        </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">
-            Offers
-          </p>
-          <h3 className="text-white text-3xl font-bold">{jobs.filter(j => j.status === 'offer').length}</h3>
-        </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">
-            Rejected
-          </p>
-          <h3 className="text-white text-3xl font-bold">{jobs.filter(j => j.status === 'rejected').length}</h3>
-        </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">
-            No Response
-          </p>
-          <h3 className="text-white text-3xl font-bold">{jobs.filter(j => j.status === 'no_response').length}</h3>
-        </div>
-      </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+      <div className="p-6 max-w-7xl mx-auto">
 
-      <div className="flex items-center justify-between mt-8 mb-2">
-        <h2 className="text-white text-lg font-semibold">Applications</h2>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition flex items-center gap-2"
-        >
-          <span className="text-lg leading-none">+</span> Add Job
-        </button>
-      </div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-slate-900 dark:text-white text-2xl font-semibold tracking-tight">
+              Waypoint
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+              Track every application in one place.
+            </p>
+          </div>
+          <ThemeToggle />
+        </div>
 
-      <table className="w-full text-left text-white mt-2 border-collapse">
-        <thead className="border-b border-zinc-800">
-          <tr>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Sno</th>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Company</th>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Role</th>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Status</th>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Link</th>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Date</th>
-            <th className="text-zinc-500 text-xs uppercase tracking-widest pb-3 pr-6">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan="7" className="text-center py-6 text-zinc-500">Loading...</td>
-            </tr>
-          ) : jobs.length === 0 ? (
-            <tr>
-              <td colSpan="7" className="text-center py-6 text-zinc-500">No jobs found.</td>
-            </tr>
-          ) : (
-            jobs.map((job, index) => (
-              <tr key={job.id} className="border-b border-zinc-800">
-                <td className="py-3 pr-6 text-sm text-zinc-300">{index + 1}</td>
-                <td className="py-3 pr-6 text-sm text-zinc-300">{job.company}</td>
-                <td className="py-3 pr-6 text-sm text-zinc-300">{job.role}</td>
-                <td className="py-3 pr-6 text-sm">
-                  <select
-                    value={job.status}
-                    onChange={(e) => handleStatusChange(job, e.target.value)}
-                    disabled={updatingStatusId === job.id}
-                    className="bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1 text-zinc-300 text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
-                  >
-                    {STATUS_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td className="py-3 pr-6 text-sm">
-                  {job.url ? (
-                    <a
-                      href={job.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 underline"
-                    >
-                      View
-                    </a>
-                  ) : (
-                    <span className="text-zinc-600">—</span>
-                  )}
-                </td>
-                <td className="py-3 pr-6 text-sm text-zinc-300">
-                  {new Date(job.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </td>
-                <td className="py-3 pr-6 text-sm">
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setEditingJob(job)}
-                      className="text-zinc-400 hover:text-white underline transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(job)}
-                      disabled={deletingId === job.id}
-                      className="text-red-500/70 hover:text-red-400 underline transition disabled:opacity-50"
-                    >
-                      {deletingId === job.id ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
-                </td>
+        <div className="grid grid-cols-5 gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
+              Total Applied
+            </p>
+            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.length}</h3>
+          </div>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
+              Interviews
+            </p>
+            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'interview').length}</h3>
+          </div>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
+              Offers
+            </p>
+            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'offer').length}</h3>
+          </div>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
+              Rejected
+            </p>
+            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'rejected').length}</h3>
+          </div>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
+              No Response
+            </p>
+            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'no_response').length}</h3>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between mt-8 mb-3">
+          <h2 className="text-slate-900 dark:text-white text-lg font-semibold">Applications</h2>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 text-sm bg-blue-700 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-lg font-medium transition flex items-center gap-2 shadow-sm"
+          >
+            <span className="text-lg leading-none">+</span> Add Job
+          </button>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+              <tr>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pl-5 pr-4 font-medium">Sno</th>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Company</th>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Role</th>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Status</th>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Link</th>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Date</th>
+                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-5 font-medium">Actions</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-8 text-slate-400 dark:text-slate-500">Loading...</td>
+                </tr>
+              ) : jobs.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-8 text-slate-400 dark:text-slate-500">No jobs found.</td>
+                </tr>
+              ) : (
+                jobs.map((job, index) => (
+                  <tr
+                    key={job.id}
+                    className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+                  >
+                    <td className="py-3 pl-5 pr-4 text-sm text-slate-500 dark:text-slate-400">{index + 1}</td>
+                    <td className="py-3 pr-4 text-sm">
+                      <div className="flex items-center gap-2.5">
+                        <CompanyAvatar name={job.company} />
+                        <span className="text-slate-900 dark:text-white font-medium">
+                          {job.company || <span className="text-slate-400 dark:text-slate-500 font-normal">—</span>}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 pr-4 text-sm text-slate-700 dark:text-slate-300">{job.role}</td>
+                    <td className="py-3 pr-4 text-sm">
+                      <select
+                        value={job.status}
+                        onChange={(e) => handleStatusChange(job, e.target.value)}
+                        disabled={updatingStatusId === job.id}
+                        className={`rounded-full px-3 py-1 text-xs font-medium border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-50 ${STATUS_STYLES[job.status] || STATUS_STYLES.applied}`}
+                      >
+                        {STATUS_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="py-3 pr-4 text-sm">
+                      {job.url ? (
+                        <a
+                          href={job.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-700 dark:text-blue-400 hover:underline font-medium"
+                        >
+                          View →
+                        </a>
+                      ) : (
+                        <span className="text-slate-300 dark:text-slate-600">—</span>
+                      )}
+                    </td>
+                    <td className="py-3 pr-4 text-sm text-slate-500 dark:text-slate-400">
+                      {new Date(job.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="py-3 pr-5 text-sm">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingJob(job)}
+                          className="px-3 py-1 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(job)}
+                          disabled={deletingId === job.id}
+                          className="px-3 py-1 text-xs font-medium rounded-md border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition disabled:opacity-50"
+                        >
+                          {deletingId === job.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      {editingJob && (
-        <EditJobModal
-          job={editingJob}
-          onClose={() => setEditingJob(null)}
-          onSave={updateJob}
-        />
-      )}
+        {editingJob && (
+          <EditJobModal
+            job={editingJob}
+            onClose={() => setEditingJob(null)}
+            onSave={updateJob}
+          />
+        )}
 
-      {showAddModal && (
-        <AddJobModal
-          onClose={() => setShowAddModal(false)}
-          onSave={addJob}
-        />
-      )}
+        {showAddModal && (
+          <AddJobModal
+            onClose={() => setShowAddModal(false)}
+            onSave={addJob}
+          />
+        )}
+      </div>
     </div>
   );
 }

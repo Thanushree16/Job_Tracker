@@ -6,6 +6,7 @@ import Profile from "./pages/Profile";
 import Appshell from "./components/layout/Appshell";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           }
         />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </Router>
   );
