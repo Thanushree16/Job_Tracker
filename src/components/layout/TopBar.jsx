@@ -39,6 +39,9 @@ function TopBar() {
           <NavLink to="/profile" className={linkClass}>
             Profile
           </NavLink>
+          <NavLink to="/extension" className={linkClass}>
+            Get Extension
+          </NavLink>
         </nav>
 
         <div className="flex items-center gap-3">

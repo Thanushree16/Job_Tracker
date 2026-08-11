@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import PasteToTrack from "./pages/PasteToTrack";
@@ -7,6 +12,7 @@ import Appshell from "./components/layout/Appshell";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import GetExtension from "./pages/GetExtension.jsx";
 
 function App() {
   return (
@@ -23,7 +29,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/paste" element={<Navigate to="/paste-to-track" replace />} />
+        <Route
+          path="/paste"
+          element={<Navigate to="/paste-to-track" replace />}
+        />
         <Route
           path="/paste-to-track"
           element={
@@ -40,6 +49,16 @@ function App() {
             <ProtectedRoute>
               <Appshell>
                 <Profile />
+              </Appshell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/extension"
+          element={
+            <ProtectedRoute>
+              <Appshell>
+                <GetExtension />
               </Appshell>
             </ProtectedRoute>
           }
