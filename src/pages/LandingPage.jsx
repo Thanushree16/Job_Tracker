@@ -62,12 +62,7 @@ function LandingPage() {
           >
             Get started free
           </Link>
-          <Link
-            to="/auth"
-            className="px-6 py-3 text-sm font-medium text-stone border border-border-light dark:border-border-dark rounded-md hover:bg-parchment dark:hover:bg-border-dark hover:text-ink dark:hover:text-parchment transition"
-          >
-            Login
-          </Link>
+          
         </div>
       </section>
     </div>
