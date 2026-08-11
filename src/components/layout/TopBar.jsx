@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import ThemeToggle from "../ThemeToggle.jsx";
+import WaypointIcon from "../WaypointIcon.jsx";
 
 function TopBar() {
   const navigate = useNavigate();
@@ -20,7 +21,11 @@ function TopBar() {
   return (
     <header className="border-b border-border-light dark:border-border-dark bg-paper dark:bg-night">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/dashboard" className="text-ink dark:text-parchment text-lg font-semibold font-display tracking-wide">
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-2 text-ink dark:text-parchment text-lg font-semibold font-display tracking-wide"
+        >
+          <WaypointIcon className="w-5 h-5 text-moss dark:text-moss-bright" />
           Waypoint
         </Link>
 
