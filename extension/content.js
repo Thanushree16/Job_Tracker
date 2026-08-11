@@ -45,21 +45,6 @@ const APPLY_CONTINUE_KEYWORDS = [
 
 const HANDOFF_TTL_MS = 10 * 60 * 1000; // 10 minutes — multi-step apply flows (resume, review, submit) can take a while
 
-// Reloading the extension invalidates chrome.runtime for every content
-// script instance already injected into open tabs (the page itself never
-// reloaded, so the old script keeps running). Any subsequent call into
-// chrome.runtime/chrome.storage from that stale instance fails -- and
-// Chrome logs the failure as a console-level resource error
-// (chrome-extension://invalid/ net::ERR_FAILED) that a try/catch around
-// the call CANNOT suppress, because it's not a thrown JS exception, it's
-// a devtools network-log entry. The real fix is checking chrome.runtime.id
-// BEFORE attempting the call, so the doomed call is never made at all.
-function isExtensionContextValid() {
-  return typeof chrome !== 'undefined' &&
-         !!chrome.runtime &&
-         chrome.runtime.id !== undefined;
-}
-
 // This flow's state for as long as this script instance is loaded.
 // { job, status: 'pending' | 'saved' | 'dismissed' | 'invalid' } or null if nothing detected yet.
 let currentSession = null;
@@ -284,7 +269,6 @@ function isValidExtraction(jobData) {
 }
 
 async function getHandoff() {
-  if (!isExtensionContextValid()) return null;
   try {
     const stored = await chrome.storage.local.get('handoffJob');
     const handoff = stored.handoffJob;
@@ -297,16 +281,14 @@ async function getHandoff() {
 }
 
 function setHandoff(session) {
-  if (!isExtensionContextValid()) return; // extension reloaded — nothing we can do about the relay, same-page toast still works
   try {
     chrome.storage.local.set({ handoffJob: { ...session, timestamp: Date.now() } });
   } catch (e) {
-    // ignore — belt-and-suspenders, the isExtensionContextValid() check above should already prevent this
+    // extension context gone (reloaded) — nothing we can do about the relay, same-page toast still works
   }
 }
 
 function clearHandoff() {
-  if (!isExtensionContextValid()) return;
   try {
     chrome.storage.local.remove('handoffJob');
   } catch (e) {
@@ -329,26 +311,26 @@ function showConfirmToast(jobData) {
       bottom: 20px;
       right: 20px;
       z-index: 2147483647;
-      background: #1e1e2e;
-      color: #fff;
-      border: 1px solid #2563eb;
-      border-radius: 10px;
+      background: #211F1C;
+      color: #EDE8DB;
+      border: 1px solid #5C6B47;
+      border-radius: 6px;
       padding: 16px 18px;
       width: 300px;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 13px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
     ">
-      <div style="font-weight: 600; margin-bottom: 8px;">Save this job to your tracker?</div>
-      <div style="opacity: 0.85; margin-bottom: 4px;">${(jobData.role || 'Untitled role').slice(0, 80)}</div>
-      <div style="opacity: 0.6; margin-bottom: 12px;">${(jobData.company || 'Unknown company').slice(0, 60)}</div>
+      <div style="font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-weight: 600; letter-spacing: 0.02em; margin-bottom: 8px;">Save this job to your tracker?</div>
+      <div style="opacity: 0.9; margin-bottom: 4px;">${(jobData.role || 'Untitled role').slice(0, 80)}</div>
+      <div style="color: #8C8575; margin-bottom: 12px;">${(jobData.company || 'Unknown company').slice(0, 60)}</div>
       <div style="display: flex; gap: 8px;">
         <button id="job-tracker-save-btn" style="
-          flex: 1; background: #2563eb; color: #fff; border: none;
+          flex: 1; background: #5C6B47; color: #EDE8DB; border: 1px solid #5C6B47;
           padding: 8px 0; border-radius: 6px; cursor: pointer; font-weight: 600;
         ">Save</button>
         <button id="job-tracker-cancel-btn" style="
-          flex: 1; background: transparent; color: #aaa; border: 1px solid #444;
+          flex: 1; background: transparent; color: #8C8575; border: 1px solid #3A362E;
           padding: 8px 0; border-radius: 6px; cursor: pointer;
         ">Cancel</button>
       </div>
@@ -367,13 +349,9 @@ function showConfirmToast(jobData) {
     saveBtn.style.cursor = 'default';
     cancelBtn.disabled = true;
 
-    if (isExtensionContextValid()) {
-      try {
-        chrome.runtime.sendMessage({ type: 'JOB_APPLY_DETECTED', job: jobData });
-      } catch (e) {
-        console.warn('Job Tracker: extension was reloaded — refresh this page and try again.');
-      }
-    } else {
+    try {
+      chrome.runtime.sendMessage({ type: 'JOB_APPLY_DETECTED', job: jobData });
+    } catch (e) {
       console.warn('Job Tracker: extension was reloaded — refresh this page and try again.');
     }
 
@@ -409,20 +387,20 @@ function showNotRecognizedToast() {
       bottom: 20px;
       right: 20px;
       z-index: 2147483647;
-      background: #1e1e2e;
-      color: #fff;
-      border: 1px solid #a1601a;
-      border-radius: 10px;
+      background: #211F1C;
+      color: #EDE8DB;
+      border: 1px solid #C1922E;
+      border-radius: 6px;
       padding: 16px 18px;
       width: 300px;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 13px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
     ">
-      <div style="font-weight: 600; margin-bottom: 8px;">Couldn't recognize the job details on this page</div>
-      <div style="opacity: 0.7; margin-bottom: 12px;">Nothing was saved. You can add this one manually from the Dashboard if needed.</div>
+      <div style="font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-weight: 600; letter-spacing: 0.02em; margin-bottom: 8px;">Couldn't recognize the job details on this page</div>
+      <div style="color: #8C8575; margin-bottom: 12px;">Nothing was saved. You can add this one manually from the Dashboard if needed.</div>
       <button id="job-tracker-dismiss-btn" style="
-        width: 100%; background: transparent; color: #aaa; border: 1px solid #444;
+        width: 100%; background: transparent; color: #8C8575; border: 1px solid #3A362E;
         padding: 8px 0; border-radius: 6px; cursor: pointer;
       ">OK</button>
     </div>
