@@ -1,14 +1,13 @@
-import Sidebar from "./Sidebar";
+import TopBar from "./TopBar";
 
 function Appshell({ children }) {
     return (
-        <div className="flex h-screen">
-            <Sidebar />
-            <main className="flex-1">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+            <TopBar />
+            <main>
                 {children}
             </main>
         </div>
-
     )
 }
 

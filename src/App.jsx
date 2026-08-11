@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import PasteToTrack from "./pages/PasteToTrack";
-import ResumeOptimizer from "./pages/ResumeOptimizer";
 import Profile from "./pages/Profile";
 import Appshell from "./components/layout/Appshell";
 import Auth from "./pages/Auth";
@@ -12,8 +12,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <Appshell>
@@ -22,22 +23,13 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/paste" element={<Navigate to="/paste-to-track" replace />} />
         <Route
-          path="/paste"
+          path="/paste-to-track"
           element={
             <ProtectedRoute>
               <Appshell>
                 <PasteToTrack />
-              </Appshell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/resume"
-          element={
-            <ProtectedRoute>
-              <Appshell>
-                <ResumeOptimizer />
               </Appshell>
             </ProtectedRoute>
           }
@@ -52,6 +44,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/login" element={<Auth />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>

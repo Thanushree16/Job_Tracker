@@ -17,7 +17,7 @@ function ProtectedRoute({ children }) {
 
   if (loading) return null
   if (!session) {
-    navigate('/auth')
+    navigate('/login')
     return null
   }
 

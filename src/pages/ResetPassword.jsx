@@ -40,7 +40,7 @@ function ResetPassword() {
     }
 
     setSuccess(true);
-    setTimeout(() => navigate("/auth"), 2000);
+    setTimeout(() => navigate("/login"), 2000);
   };
 
   return (

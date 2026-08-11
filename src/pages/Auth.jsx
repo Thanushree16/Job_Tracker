@@ -36,14 +36,14 @@ function Auth() {
       if (error) {
         alert("Login failed: " + error.message);
       } else {
-        navigate("/");
+        navigate("/dashboard");
       }
     } else {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) {
         alert("Sign up failed: " + error.message);
       } else {
-        navigate("/");
+        navigate("/dashboard");
       }
     }
   };
