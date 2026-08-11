@@ -3,3 +3,4 @@
 body {
   background-color: #09090b;
 }
+@custom-variant dark (&:where(.dark, .dark *));
