@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useJobs } from "../hooks/useJobs.js";
 import EditJobModal from "./EditJobModal.jsx";
 import AddJobModal from "./AddJobModal.jsx";
-import ThemeToggle from "../components/ThemeToggle.jsx";
+
 
 const STATUS_OPTIONS = [
   { value: "applied", label: "Applied" },
@@ -67,17 +67,6 @@ function Dashboard() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
       <div className="p-6 max-w-7xl mx-auto">
 
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-slate-900 dark:text-white text-2xl font-semibold tracking-tight">
-              Waypoint
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-              Track every application in one place.
-            </p>
-          </div>
-          <ThemeToggle />
-        </div>
 
         <div className="grid grid-cols-5 gap-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
