@@ -54,23 +54,23 @@ function PasteToTrack() {
   return (
     <div className="max-w-2xl mx-auto w-full p-6 flex flex-col gap-6">
       <div>
-        <h1 className="text-white text-xl font-semibold mb-1">Paste to Track</h1>
-        <p className="text-zinc-500 text-sm">Paste a job description and we'll extract the details automatically.</p>
+        <h1 className="text-ink dark:text-parchment text-xl font-semibold font-display tracking-wide mb-1">Paste to Track</h1>
+        <p className="text-stone text-sm">Paste a job description and we'll extract the details automatically.</p>
       </div>
       <div className="flex flex-col gap-3">
-        <label htmlFor="jdText" className="text-zinc-400 text-sm font-medium">
+        <label htmlFor="jdText" className="text-stone text-sm font-medium">
           Job Description
         </label>
         <textarea
           id="jdText"
-          className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          className="bg-paper dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md p-4 text-sm text-ink dark:text-parchment focus:outline-none focus:border-moss dark:focus:border-moss-bright resize-none"
           rows="12"
           placeholder="Paste the full job description here..."
           value={jdText}
           onChange={(e) => setJdText(e.target.value)}
         ></textarea>
         <button
-          className="w-full bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="w-full bg-moss text-parchment px-4 py-3 rounded-md hover:bg-moss-bright transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium border border-moss dark:border-moss-bright"
           onClick={handleTrack}
           disabled={loading || jdText.trim() === ""}
         >

@@ -1,2 +1,23 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-paper: #EAE6D9;
+  --color-night: #211F1C;
+  --color-ink: #2B2926;
+  --color-parchment: #EDE8DB;
+  --color-moss: #5C6B47;
+  --color-moss-bright: #7A8F5E;
+  --color-denim: #4C6B7A;
+  --color-denim-bright: #6B8FA0;
+  --color-ochre: #C1922E;
+  --color-brick: #9C5B45;
+  --color-brick-bright: #B5715A;
+  --color-stone: #8C8575;
+  --color-border-light: #D9D3C0;
+  --color-border-dark: #3A362E;
+  --font-display: "IBM Plex Mono", monospace;
+  --font-body: "IBM Plex Sans", sans-serif;
+}
+
+body { font-family: var(--font-body); }

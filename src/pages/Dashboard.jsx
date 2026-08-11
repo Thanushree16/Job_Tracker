@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useJobs } from "../hooks/useJobs.js";
 import EditJobModal from "./EditJobModal.jsx";
 import AddJobModal from "./AddJobModal.jsx";
-
+import StatusStamp from "../components/StatusStamp.jsx";
 
 const STATUS_OPTIONS = [
   { value: "applied", label: "Applied" },
@@ -12,20 +12,10 @@ const STATUS_OPTIONS = [
   { value: "no_response", label: "No Response" },
 ];
 
-// Full literal class strings (not built dynamically) so Tailwind's compiler
-// can actually detect and include them in the build.
-const STATUS_STYLES = {
-  applied: "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
-  interview: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-900",
-  offer: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900",
-  rejected: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
-  no_response: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900",
-};
-
 function CompanyAvatar({ name }) {
   const initial = (name || "?").trim().charAt(0).toUpperCase() || "?";
   return (
-    <div className="w-7 h-7 rounded-full bg-slate-900 dark:bg-slate-700 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0">
+    <div className="w-7 h-7 rounded-md bg-moss text-parchment text-xs font-bold font-display flex items-center justify-center flex-shrink-0">
       {initial}
     </div>
   );
@@ -64,97 +54,113 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-      <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
 
-
-        <div className="grid grid-cols-5 gap-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
-              Total Applied
-            </p>
-            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.length}</h3>
-          </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
-              Interviews
-            </p>
-            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'interview').length}</h3>
-          </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
-              Offers
-            </p>
-            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'offer').length}</h3>
-          </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
-              Rejected
-            </p>
-            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'rejected').length}</h3>
-          </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-1">
-              No Response
-            </p>
-            <h3 className="text-slate-900 dark:text-white text-3xl font-bold">{jobs.filter(j => j.status === 'no_response').length}</h3>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-ink dark:text-parchment text-2xl font-semibold font-display tracking-wide">
+            Waypoint
+          </h1>
+          <p className="text-stone text-sm mt-0.5">
+            Track every application in one place.
+          </p>
         </div>
+      </div>
 
-        <div className="flex items-center justify-between mt-8 mb-3">
-          <h2 className="text-slate-900 dark:text-white text-lg font-semibold">Applications</h2>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 text-sm bg-blue-700 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-lg font-medium transition flex items-center gap-2 shadow-sm"
-          >
-            <span className="text-lg leading-none">+</span> Add Job
-          </button>
+      <div className="grid grid-cols-5 gap-4">
+        <div className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-5">
+          <p className="text-stone text-xs uppercase tracking-widest mb-1">
+            Total Applied
+          </p>
+          <h3 className="text-ink dark:text-parchment text-3xl font-bold font-display tracking-wide">{jobs.length}</h3>
         </div>
+        <div className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-5">
+          <p className="text-stone text-xs uppercase tracking-widest mb-1">
+            Interviews
+          </p>
+          <h3 className="text-ink dark:text-parchment text-3xl font-bold font-display tracking-wide">{jobs.filter(j => j.status === 'interview').length}</h3>
+        </div>
+        <div className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-5">
+          <p className="text-stone text-xs uppercase tracking-widest mb-1">
+            Offers
+          </p>
+          <h3 className="text-ink dark:text-parchment text-3xl font-bold font-display tracking-wide">{jobs.filter(j => j.status === 'offer').length}</h3>
+        </div>
+        <div className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-5">
+          <p className="text-stone text-xs uppercase tracking-widest mb-1">
+            Rejected
+          </p>
+          <h3 className="text-ink dark:text-parchment text-3xl font-bold font-display tracking-wide">{jobs.filter(j => j.status === 'rejected').length}</h3>
+        </div>
+        <div className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-5">
+          <p className="text-stone text-xs uppercase tracking-widest mb-1">
+            No Response
+          </p>
+          <h3 className="text-ink dark:text-parchment text-3xl font-bold font-display tracking-wide">{jobs.filter(j => j.status === 'no_response').length}</h3>
+        </div>
+      </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex items-center justify-between mt-8 mb-3">
+        <h2 className="text-ink dark:text-parchment text-lg font-semibold font-display tracking-wide">Applications</h2>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="px-4 py-2 text-sm bg-moss hover:bg-moss-bright dark:bg-moss dark:hover:bg-moss-bright text-parchment rounded-md font-medium transition flex items-center gap-2 border border-moss dark:border-moss-bright"
+        >
+          <span className="text-lg leading-none">+</span> Add Job
+        </button>
+      </div>
+
+      <div className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-paper dark:bg-border-dark/50 border-b border-border-light dark:border-border-dark">
+            <tr>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pl-5 pr-4 font-medium">Sno</th>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pr-4 font-medium">Company</th>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pr-4 font-medium">Role</th>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pr-4 font-medium">Status</th>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pr-4 font-medium">Link</th>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pr-4 font-medium">Date</th>
+              <th className="text-stone text-xs uppercase tracking-widest py-3 pr-5 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
               <tr>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pl-5 pr-4 font-medium">Sno</th>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Company</th>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Role</th>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Status</th>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Link</th>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-4 font-medium">Date</th>
-                <th className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest py-3 pr-5 font-medium">Actions</th>
+                <td colSpan="7" className="text-center py-8 text-stone">Loading...</td>
               </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-8 text-slate-400 dark:text-slate-500">Loading...</td>
-                </tr>
-              ) : jobs.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-8 text-slate-400 dark:text-slate-500">No jobs found.</td>
-                </tr>
-              ) : (
-                jobs.map((job, index) => (
-                  <tr
-                    key={job.id}
-                    className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-                  >
-                    <td className="py-3 pl-5 pr-4 text-sm text-slate-500 dark:text-slate-400">{index + 1}</td>
-                    <td className="py-3 pr-4 text-sm">
-                      <div className="flex items-center gap-2.5">
-                        <CompanyAvatar name={job.company} />
-                        <span className="text-slate-900 dark:text-white font-medium">
-                          {job.company || <span className="text-slate-400 dark:text-slate-500 font-normal">—</span>}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3 pr-4 text-sm text-slate-700 dark:text-slate-300">{job.role}</td>
-                    <td className="py-3 pr-4 text-sm">
+            ) : jobs.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="text-center py-8 text-stone">No jobs found.</td>
+              </tr>
+            ) : (
+              jobs.map((job, index) => (
+                <tr
+                  key={job.id}
+                  className="border-b border-border-light dark:border-border-dark last:border-0 hover:bg-paper dark:hover:bg-border-dark/40 transition-colors"
+                >
+                  <td className="py-3 pl-5 pr-4 text-sm text-stone">{index + 1}</td>
+                  <td className="py-3 pr-4 text-sm">
+                    <div className="flex items-center gap-2.5">
+                      <CompanyAvatar name={job.company} />
+                      <span className="text-ink dark:text-parchment font-medium">
+                        {job.company || <span className="text-stone font-normal">—</span>}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3 pr-4 text-sm text-stone dark:text-stone">{job.role}</td>
+                  <td className="py-3 pr-4 text-sm">
+                    <div className="relative inline-block group">
+                      <StatusStamp
+                        status={job.status}
+                        label={STATUS_OPTIONS.find(o => o.value === job.status)?.label || job.status}
+                        seed={job.id}
+                      />
                       <select
                         value={job.status}
                         onChange={(e) => handleStatusChange(job, e.target.value)}
                         disabled={updatingStatusId === job.id}
-                        className={`rounded-full px-3 py-1 text-xs font-medium border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-50 ${STATUS_STYLES[job.status] || STATUS_STYLES.applied}`}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+                        aria-label="Change status"
                       >
                         {STATUS_OPTIONS.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -162,63 +168,63 @@ function Dashboard() {
                           </option>
                         ))}
                       </select>
-                    </td>
-                    <td className="py-3 pr-4 text-sm">
-                      {job.url ? (
-                        <a
-                          href={job.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-700 dark:text-blue-400 hover:underline font-medium"
-                        >
-                          View →
-                        </a>
-                      ) : (
-                        <span className="text-slate-300 dark:text-slate-600">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 pr-4 text-sm text-slate-500 dark:text-slate-400">
-                      {new Date(job.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                    </td>
-                    <td className="py-3 pr-5 text-sm">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setEditingJob(job)}
-                          className="px-3 py-1 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(job)}
-                          disabled={deletingId === job.id}
-                          className="px-3 py-1 text-xs font-medium rounded-md border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition disabled:opacity-50"
-                        >
-                          {deletingId === job.id ? "Deleting..." : "Delete"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {editingJob && (
-          <EditJobModal
-            job={editingJob}
-            onClose={() => setEditingJob(null)}
-            onSave={updateJob}
-          />
-        )}
-
-        {showAddModal && (
-          <AddJobModal
-            onClose={() => setShowAddModal(false)}
-            onSave={addJob}
-          />
-        )}
+                    </div>
+                  </td>
+                  <td className="py-3 pr-4 text-sm">
+                    {job.url ? (
+                      <a
+                        href={job.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-denim dark:text-denim-bright hover:underline font-medium"
+                      >
+                        View →
+                      </a>
+                    ) : (
+                      <span className="text-stone">—</span>
+                    )}
+                  </td>
+                  <td className="py-3 pr-4 text-sm text-stone">
+                    {new Date(job.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </td>
+                  <td className="py-3 pr-5 text-sm">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setEditingJob(job)}
+                        className="px-3 py-1 text-xs font-medium rounded-md border border-border-light dark:border-border-dark text-stone dark:text-stone hover:bg-paper dark:hover:bg-border-dark hover:text-ink dark:hover:text-parchment transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(job)}
+                        disabled={deletingId === job.id}
+                        className="px-3 py-1 text-xs font-medium rounded-md border border-brick dark:border-brick text-brick dark:text-brick hover:bg-brick hover:text-parchment dark:hover:bg-brick dark:hover:text-parchment transition disabled:opacity-50"
+                      >
+                        {deletingId === job.id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {editingJob && (
+        <EditJobModal
+          job={editingJob}
+          onClose={() => setEditingJob(null)}
+          onSave={updateJob}
+        />
+      )}
+
+      {showAddModal && (
+        <AddJobModal
+          onClose={() => setShowAddModal(false)}
+          onSave={addJob}
+        />
+      )}
     </div>
   );
 }

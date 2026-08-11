@@ -24,7 +24,7 @@ function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Toggle theme"
-      className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition"
+      className="w-9 h-9 flex items-center justify-center rounded-md border border-border-light bg-paper text-stone hover:bg-parchment dark:border-border-dark dark:bg-night dark:text-stone dark:hover:bg-border-dark transition"
     >
       {theme === "dark" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
     </button>

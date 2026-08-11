@@ -28,22 +28,22 @@ function EditJobModal({ job, onClose, onSave }) {
   }
 
   const inputClasses =
-    "w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 dark:focus:border-blue-500"
+    "w-full bg-paper dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-ink dark:text-parchment text-sm focus:outline-none focus:border-moss dark:focus:border-moss-bright"
 
   return (
     <div
-      className="fixed inset-0 bg-slate-900/50 dark:bg-black/70 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-night/50 dark:bg-black/70 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 w-full max-w-md shadow-xl"
+        className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-slate-900 dark:text-white text-lg font-semibold mb-4">Edit Job</h2>
+        <h2 className="text-ink dark:text-parchment text-lg font-semibold font-display tracking-wide mb-4">Edit Job</h2>
 
         <div className="space-y-4">
           <div>
-            <label className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest block mb-1">
+            <label className="text-stone text-xs uppercase tracking-widest block mb-1">
               Company
             </label>
             <input
@@ -55,7 +55,7 @@ function EditJobModal({ job, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest block mb-1">
+            <label className="text-stone text-xs uppercase tracking-widest block mb-1">
               Role
             </label>
             <input
@@ -67,7 +67,7 @@ function EditJobModal({ job, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest block mb-1">
+            <label className="text-stone text-xs uppercase tracking-widest block mb-1">
               Job Link
             </label>
             <input
@@ -80,20 +80,20 @@ function EditJobModal({ job, onClose, onSave }) {
           </div>
         </div>
 
-        {error && <p className="text-red-600 dark:text-red-400 text-sm mt-3">{error}</p>}
+        {error && <p className="text-brick dark:text-brick-bright text-sm mt-3">{error}</p>}
 
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition"
+            className="px-4 py-2 text-sm text-stone hover:text-ink dark:hover:text-parchment transition"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 text-sm bg-blue-700 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-lg font-medium transition disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-moss hover:bg-moss-bright text-parchment rounded-md font-medium transition border border-moss dark:border-moss-bright disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>

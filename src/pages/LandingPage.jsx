@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import StatusStamp from "../components/StatusStamp.jsx";
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -17,23 +18,23 @@ function LandingPage() {
   if (checking) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-      <header className="border-b border-slate-200 dark:border-slate-800">
+    <div className="min-h-screen bg-paper dark:bg-night transition-colors">
+      <header className="border-b border-border-light dark:border-border-dark">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="text-slate-900 dark:text-white text-lg font-semibold tracking-tight">
+          <Link to="/" className="text-ink dark:text-parchment text-lg font-semibold font-display tracking-wide">
             Waypoint
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Link
               to="/auth"
-              className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+              className="px-4 py-2 text-sm font-medium text-stone hover:text-ink dark:hover:text-parchment transition"
             >
               Login
             </Link>
             <Link
               to="/auth?mode=signup"
-              className="px-4 py-2 text-sm font-medium bg-blue-700 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-lg transition shadow-sm"
+              className="px-4 py-2 text-sm font-medium bg-moss hover:bg-moss-bright text-parchment rounded-md transition border border-moss dark:border-moss-bright"
             >
               Sign Up
             </Link>
@@ -42,20 +43,31 @@ function LandingPage() {
       </header>
 
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <h1 className="text-slate-900 dark:text-white text-4xl sm:text-5xl font-bold tracking-tight">
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <StatusStamp status="applied" label="APPLIED" seed="A" />
+          <StatusStamp status="interview" label="INTERVIEW" seed="I" />
+          <StatusStamp status="offer" label="OFFER" seed="O" />
+        </div>
+
+        <h1 className="text-ink dark:text-parchment text-4xl sm:text-5xl font-bold font-display tracking-wide">
           Track every job application in one place.
         </h1>
-        <p className="mt-4 text-slate-500 dark:text-slate-400 text-lg max-w-2xl mx-auto">
+        <p className="mt-4 text-stone text-lg max-w-2xl mx-auto">
           Waypoint keeps your applications organized — from first submit to final offer.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">
           <Link
             to="/auth?mode=signup"
-            className="px-6 py-3 text-sm font-medium bg-blue-700 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-lg transition shadow-sm"
+            className="px-6 py-3 text-sm font-medium bg-moss hover:bg-moss-bright text-parchment rounded-md transition border border-moss dark:border-moss-bright"
           >
             Get started free
           </Link>
-          
+          <Link
+            to="/auth"
+            className="px-6 py-3 text-sm font-medium text-stone border border-border-light dark:border-border-dark rounded-md hover:bg-parchment dark:hover:bg-border-dark hover:text-ink dark:hover:text-parchment transition"
+          >
+            Login
+          </Link>
         </div>
       </section>
     </div>

@@ -54,9 +54,9 @@ function Auth() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-950">
-      <div className="bg-zinc-900 rounded-xl p-8 w-96 flex flex-col gap-4 border border-zinc-800">
-        <h2 className="text-white text-2xl font-bold">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-paper dark:bg-night transition-colors">
+      <div className="bg-parchment dark:bg-night rounded-md p-8 w-96 flex flex-col gap-4 border border-border-light dark:border-border-dark">
+        <h2 className="text-ink dark:text-parchment text-2xl font-bold font-display tracking-wide">
           {mode === "login" && "Login"}
           {mode === "signup" && "Sign Up"}
           {mode === "forgot" && "Reset Password"}
@@ -64,12 +64,12 @@ function Auth() {
 
         {mode === "forgot" && resetSent ? (
           <div className="flex flex-col gap-4">
-            <p className="text-zinc-300 text-sm">
-              Check <span className="text-white font-medium">{email}</span> for a link to reset your password.
+            <p className="text-stone text-sm">
+              Check <span className="text-ink dark:text-parchment font-medium">{email}</span> for a link to reset your password.
             </p>
             <button
               onClick={() => switchMode("login")}
-              className="w-full bg-white text-black font-semibold rounded-lg py-2 hover:bg-zinc-200 transition-colors"
+              className="w-full bg-moss hover:bg-moss-bright text-parchment font-semibold rounded-md py-2 transition border border-moss dark:border-moss-bright"
             >
               Back to Login
             </button>
@@ -82,7 +82,7 @@ function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 outline-none focus:border-zinc-500"
+              className="w-full bg-paper dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md px-4 py-2 text-ink dark:text-parchment placeholder-stone outline-none focus:border-moss dark:focus:border-moss-bright"
             />
 
             {mode !== "forgot" && (
@@ -92,14 +92,14 @@ function Auth() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 outline-none focus:border-zinc-500"
+                className="w-full bg-paper dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md px-4 py-2 text-ink dark:text-parchment placeholder-stone outline-none focus:border-moss dark:focus:border-moss-bright"
               />
             )}
 
             {mode === "login" && (
               <p
                 onClick={() => switchMode("forgot")}
-                className="text-zinc-500 text-xs text-right -mt-1 cursor-pointer hover:text-zinc-300"
+                className="text-stone text-xs text-right -mt-1 cursor-pointer hover:text-ink dark:hover:text-parchment"
               >
                 Forgot password?
               </p>
@@ -108,7 +108,7 @@ function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black font-semibold rounded-lg py-2 hover:bg-zinc-200 transition-colors disabled:opacity-50"
+              className="w-full bg-moss hover:bg-moss-bright text-parchment font-semibold rounded-md py-2 transition border border-moss dark:border-moss-bright disabled:opacity-50"
             >
               {mode === "login" && "Login"}
               {mode === "signup" && "Sign Up"}
@@ -120,7 +120,7 @@ function Auth() {
         {mode !== "forgot" && (
           <p
             onClick={() => switchMode(mode === "login" ? "signup" : "login")}
-            className="text-zinc-500 text-sm text-center cursor-pointer hover:text-zinc-300"
+            className="text-stone text-sm text-center cursor-pointer hover:text-ink dark:hover:text-parchment"
           >
             {mode === "login"
               ? "Don't have an account? Sign Up"
@@ -131,7 +131,7 @@ function Auth() {
         {mode === "forgot" && !resetSent && (
           <p
             onClick={() => switchMode("login")}
-            className="text-zinc-500 text-sm text-center cursor-pointer hover:text-zinc-300"
+            className="text-stone text-sm text-center cursor-pointer hover:text-ink dark:hover:text-parchment"
           >
             Back to Login
           </p>

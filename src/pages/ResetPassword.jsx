@@ -44,12 +44,12 @@ function ResetPassword() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-950">
-      <div className="bg-zinc-900 rounded-xl p-8 w-96 flex flex-col gap-4 border border-zinc-800">
-        <h2 className="text-white text-2xl font-bold">Set a New Password</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-paper dark:bg-night transition-colors">
+      <div className="bg-parchment dark:bg-night rounded-md p-8 w-96 flex flex-col gap-4 border border-border-light dark:border-border-dark">
+        <h2 className="text-ink dark:text-parchment text-2xl font-bold font-display tracking-wide">Set a New Password</h2>
 
         {success ? (
-          <p className="text-zinc-300 text-sm">
+          <p className="text-stone text-sm">
             Password updated. Redirecting you to login...
           </p>
         ) : (
@@ -60,7 +60,7 @@ function ResetPassword() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 outline-none focus:border-zinc-500"
+              className="w-full bg-paper dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md px-4 py-2 text-ink dark:text-parchment placeholder-stone outline-none focus:border-moss dark:focus:border-moss-bright"
             />
             <input
               type="password"
@@ -68,15 +68,15 @@ function ResetPassword() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 outline-none focus:border-zinc-500"
+              className="w-full bg-paper dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md px-4 py-2 text-ink dark:text-parchment placeholder-stone outline-none focus:border-moss dark:focus:border-moss-bright"
             />
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && <p className="text-brick dark:text-brick-bright text-sm">{error}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black font-semibold rounded-lg py-2 hover:bg-zinc-200 transition-colors disabled:opacity-50"
+              className="w-full bg-moss hover:bg-moss-bright text-parchment font-semibold rounded-md py-2 transition border border-moss dark:border-moss-bright disabled:opacity-50"
             >
               {loading ? "Updating..." : "Update Password"}
             </button>

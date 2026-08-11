@@ -46,21 +46,21 @@ function Profile() {
     return acc
   }, {})
 
-  if (!user) return <div className="p-6 text-gray-400">Loading...</div>
+  if (!user) return <div className="p-6 text-stone">Loading...</div>
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
-      
+
       {/* Avatar + Name */}
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-white text-2xl font-bold">
+        <div className="w-16 h-16 rounded-md bg-moss flex items-center justify-center text-parchment text-2xl font-bold font-display tracking-wide">
           {getInitials(user.email)}
         </div>
         <div>
           {editing ? (
             <div className="flex gap-2 items-center">
               <input
-                className="border border-gray-600 bg-gray-800 text-white rounded px-2 py-1 text-sm"
+                className="border border-border-light dark:border-border-dark bg-paper dark:bg-border-dark text-ink dark:text-parchment rounded-md px-2 py-1 text-sm focus:outline-none focus:border-moss dark:focus:border-moss-bright"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Enter display name"
@@ -68,55 +68,55 @@ function Profile() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="text-sm bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+                className="text-sm bg-moss text-parchment px-3 py-1 rounded-md hover:bg-moss-bright border border-moss dark:border-moss-bright"
               >
                 {saving ? "Saving..." : "Save"}
               </button>
               <button
                 onClick={() => setEditing(false)}
-                className="text-sm text-gray-400 hover:text-white"
+                className="text-sm text-stone hover:text-ink dark:hover:text-parchment"
               >
                 Cancel
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <h2 className="text-white text-xl font-semibold">
+              <h2 className="text-ink dark:text-parchment text-xl font-semibold font-display tracking-wide">
                 {displayName || user.email}
               </h2>
               <button
                 onClick={() => setEditing(true)}
-                className="text-xs text-indigo-400 hover:text-indigo-300"
+                className="text-xs text-denim dark:text-denim-bright hover:underline"
               >
                 Edit
               </button>
             </div>
           )}
-          <p className="text-gray-400 text-sm">{user.email}</p>
+          <p className="text-stone text-sm">{user.email}</p>
         </div>
       </div>
 
       {/* Joined Date */}
-      <div className="bg-gray-800 rounded-lg p-4">
-        <p className="text-gray-400 text-sm">Member since</p>
-        <p className="text-white font-medium">{joinedDate}</p>
+      <div className="bg-parchment dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md p-4">
+        <p className="text-stone text-sm">Member since</p>
+        <p className="text-ink dark:text-parchment font-medium">{joinedDate}</p>
       </div>
 
       {/* Application Stats */}
-      <div className="bg-gray-800 rounded-lg p-4 space-y-3">
-        <h3 className="text-white font-semibold">Application Summary</h3>
+      <div className="bg-parchment dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md p-4 space-y-3">
+        <h3 className="text-ink dark:text-parchment font-semibold font-display tracking-wide">Application Summary</h3>
         {loading ? (
-          <p className="text-gray-400 text-sm">Loading stats...</p>
+          <p className="text-stone text-sm">Loading stats...</p>
         ) : (
           <>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Total Applications</span>
-              <span className="text-white font-bold">{jobs.length}</span>
+              <span className="text-stone">Total Applications</span>
+              <span className="text-ink dark:text-parchment font-bold font-display">{jobs.length}</span>
             </div>
             {Object.entries(statusCounts).map(([status, count]) => (
               <div key={status} className="flex justify-between text-sm">
-                <span className="text-gray-400 capitalize">{status}</span>
-                <span className="text-white">{count}</span>
+                <span className="text-stone capitalize">{status}</span>
+                <span className="text-ink dark:text-parchment">{count}</span>
               </div>
             ))}
           </>
@@ -126,7 +126,7 @@ function Profile() {
       {/* Sign Out */}
       <button
         onClick={() => supabase.auth.signOut()}
-        className="w-full text-sm text-red-400 border border-red-400 rounded-lg py-2 hover:bg-red-400 hover:text-white transition"
+        className="w-full text-sm text-brick dark:text-brick-bright border border-brick dark:border-brick-bright rounded-md py-2 hover:bg-brick hover:text-parchment transition"
       >
         Sign Out
       </button>
