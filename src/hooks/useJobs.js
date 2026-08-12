@@ -38,5 +38,67 @@ export function useJobs() {
     return { data }
   }
 
-  return { jobs, loading, updateJob }
+  const deleteJob = async (id) => {
+    const { error } = await supabase.from("jobs").delete().eq("id", id)
+
+    if (error) {
+      console.error("Error deleting job:", error)
+      return { error }
+    }
+
+    setJobs((prev) => prev.filter((job) => job.id !== id))
+    return { success: true }
+  }
+
+  // Manual add — for jobs that never went through the extension (referrals,
+  // career-page applications you found yourself, anything applied to before
+  // installing the extension, etc). Requires the current user's id since the
+  // insert RLS policy checks auth.uid() = user_id on the row being created.
+  //
+  // Uses getSession() rather than getUser() — getUser() makes a live network
+  // round-trip to Supabase's Auth server to re-verify the token every call,
+  // which is the right call for security-critical server-side checks but
+  // unnecessary overhead here: supabase-js already manages this session
+  // securely and refreshes it proactively, and the RLS policy independently
+  // re-checks auth.uid() server-side regardless of what this call returns.
+  const addJob = async (newJob) => {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
+
+    const user = session?.user
+
+    if (sessionError || !user) {
+      console.error("Error getting current session:", sessionError)
+      return { error: sessionError || new Error("Not authenticated") }
+    }
+
+    const payload = {
+      user_id: user.id,
+      company: newJob.company || "",
+      role: newJob.role || "",
+      status: newJob.status || "applied",
+      url: newJob.url || "",
+      jd_text: "",
+      applied_at: newJob.applied_at || new Date().toISOString(),
+    }
+
+    const { data, error } = await supabase
+      .from("jobs")
+      .insert(payload)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error adding job:", error)
+      return { error }
+    }
+
+    // New entries go to the top so the just-added job is immediately visible.
+    setJobs((prev) => [data, ...prev])
+    return { data }
+  }
+
+  return { jobs, loading, updateJob, deleteJob, addJob }
 }
