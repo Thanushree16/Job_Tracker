@@ -303,7 +303,6 @@ async function getHandoff() {
     if (!handoff) return null;
     if (Date.now() - handoff.timestamp > HANDOFF_TTL_MS) return null;
     return handoff;
-  // eslint-disable-next-line no-unused-vars
   } catch (e) {
     return null;
   }
@@ -319,9 +318,7 @@ function setHandoff(session) {
 
 function clearHandoff() {
   try {
-    // eslint-disable-next-line no-undef
     chrome.storage.local.remove('handoffJob');
-  // eslint-disable-next-line no-unused-vars
   } catch (e) {
     // ignore
   }
@@ -369,6 +366,7 @@ function showConfirmToast(jobData) {
           padding: 8px 0; border-radius: 6px; cursor: pointer;
         ">Cancel</button>
       </div>
+      <div id="job-tracker-error" style="display: none; color: #B5715A; font-size: 12px; margin-top: 10px; line-height: 1.4;"></div>
     </div>
   `;
   document.body.appendChild(toast);
@@ -380,20 +378,54 @@ function showConfirmToast(jobData) {
     if (isSaving) return; // second click while the first is already processing — ignore
     isSaving = true;
     saveBtn.disabled = true;
-    saveBtn.style.opacity = '0.5';
-    saveBtn.style.cursor = 'default';
+    saveBtn.textContent = 'Saving...';
+    saveBtn.style.opacity = '0.7';
     cancelBtn.disabled = true;
 
-    try {
-      // eslint-disable-next-line no-undef
-      chrome.runtime.sendMessage({ type: 'JOB_APPLY_DETECTED', job: jobData });
-    } catch (e) {
-      console.warn('Job Tracker: extension was reloaded — refresh this page and try again.');
-    }
+    const errorEl = toast.querySelector('#job-tracker-error');
+    if (errorEl) errorEl.style.display = 'none';
 
-    sessionsByJobKey.set(jobKey, { job: jobData, status: 'saved' });
-    clearHandoff();
-    toast.remove();
+    const resetButtons = () => {
+      isSaving = false;
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+      saveBtn.style.opacity = '1';
+      cancelBtn.disabled = false;
+    };
+
+    const showError = (message) => {
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      resetButtons();
+    };
+
+    try {
+      chrome.runtime.sendMessage({ type: 'JOB_APPLY_DETECTED', job: jobData }, (response) => {
+        if (chrome.runtime.lastError) {
+          showError('Extension was reloaded — refresh this page and try again.');
+          return;
+        }
+
+        if (response && response.success) {
+          sessionsByJobKey.set(jobKey, { job: jobData, status: 'saved' });
+          clearHandoff();
+          toast.remove();
+          return;
+        }
+
+        const messages = {
+          not_logged_in: "Not logged in to Waypoint — open the site, log in, then try again.",
+          session_expired: "Your session expired — log in to Waypoint again, then retry.",
+          save_failed: "Couldn't save that job. Try again.",
+          network_error: "Network error — check your connection and try again.",
+        };
+        showError(messages[response?.error] || "Couldn't save. Try again.");
+      });
+    } catch (e) {
+      showError('Extension was reloaded — refresh this page and try again.');
+    }
   });
 
   cancelBtn.addEventListener('click', () => {
