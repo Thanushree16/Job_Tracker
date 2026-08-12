@@ -3,22 +3,32 @@
 // Detects "Apply" clicks, extracts job data from the current page,
 // shows a confirm/cancel prompt, and only saves if you hit Save.
 //
-// KEY INSIGHT (from testing Indeed's multi-step "smart apply" flow):
+// KEY INSIGHT #1 (from testing Indeed's multi-step "smart apply" flow):
 // Real job data (company, role) only exists on the ORIGINAL job listing page
 // (JSON-LD JobPosting schema). Once you click Apply and land in the
 // multi-step apply flow (resume upload -> review -> submit), those later
 // steps have NO job metadata at all -- it's a generic form host. So instead
 // of re-extracting on every apply-like click (which fails on later steps
-// and can overwrite a GOOD earlier capture with a BAD one), we now capture
-// ONCE per apply flow and carry that single capture through:
+// and can overwrite a GOOD earlier capture with a BAD one), we capture ONCE
+// per job and carry that single capture through subsequent clicks.
 //
-// - `currentSession` (in-memory): this flow's state for as long as THIS
-//   script instance stays loaded. Resets naturally on any real new page
-//   load -- which is exactly when a genuinely different apply flow starts.
+// KEY INSIGHT #2 (from testing LinkedIn's job search page):
+// Some sites are single-page apps where clicking a DIFFERENT job never
+// reloads the page at all -- the script instance stays alive across many
+// jobs in one browsing session. A single global "have I handled this
+// already" flag (which worked fine for Indeed's one-flow-per-page-load
+// model) meant saving job A permanently marked the whole PAGE as handled,
+// silently blocking the toast for every job clicked afterward. So session
+// state is tracked per JOB (keyed by an ID pulled from the URL), not per
+// page load:
+//
+// - `sessionsByJobKey` (in-memory Map): each job's state for as long as
+//   this script instance stays loaded. A new job key (different job
+//   clicked, even without a page reload) always starts fresh.
 // - `handoffJob` (chrome.storage.local): a single-use relay that survives
-//   the ONE real cross-origin navigation this flow makes (e.g.
-//   indeed.com -> smartapply.indeed.com), since that jump wipes
-//   `currentSession` along with the whole script instance.
+//   the ONE real cross-origin navigation a flow makes (e.g.
+//   indeed.com -> smartapply.indeed.com), since that jump wipes this
+//   script instance -- and the in-memory Map along with it.
 
 // Two tiers, deliberately separated:
 // - START keywords are strong, unambiguous "this is a job apply action" signals.
@@ -45,9 +55,27 @@ const APPLY_CONTINUE_KEYWORDS = [
 
 const HANDOFF_TTL_MS = 10 * 60 * 1000; // 10 minutes — multi-step apply flows (resume, review, submit) can take a while
 
-// This flow's state for as long as this script instance is loaded.
-// { job, status: 'pending' | 'saved' | 'dismissed' | 'invalid' } or null if nothing detected yet.
-let currentSession = null;
+// Was a single global variable — but on SPA sites like LinkedIn's job search
+// page, the script instance stays alive across MANY different jobs in one
+// browsing session (clicking a different job in the list doesn't reload the
+// page, just swaps content via JS). A single global session meant saving job
+// A permanently marked the whole page "already handled", silently blocking
+// the toast for every job clicked afterward. Now keyed per job, using an ID
+// pulled from the URL, so switching jobs naturally starts a fresh session.
+const sessionsByJobKey = new Map();
+
+function getPageJobKey() {
+  try {
+    const url = new URL(window.location.href);
+    const currentJobId = url.searchParams.get('currentJobId');
+    if (currentJobId) return currentJobId;
+    const viewMatch = url.pathname.match(/\/jobs\/view\/(\d+)/);
+    if (viewMatch) return viewMatch[1];
+  } catch (e) {
+    // fall through to URL-based fallback below
+  }
+  return cleanUrl(window.location.href);
+}
 
 function matchesKeywords(control, keywords) {
   const text = (control.innerText || control.textContent || control.value || '')
@@ -275,6 +303,7 @@ async function getHandoff() {
     if (!handoff) return null;
     if (Date.now() - handoff.timestamp > HANDOFF_TTL_MS) return null;
     return handoff;
+  // eslint-disable-next-line no-unused-vars
   } catch (e) {
     return null;
   }
@@ -290,7 +319,9 @@ function setHandoff(session) {
 
 function clearHandoff() {
   try {
+    // eslint-disable-next-line no-undef
     chrome.storage.local.remove('handoffJob');
+  // eslint-disable-next-line no-unused-vars
   } catch (e) {
     // ignore
   }
@@ -299,6 +330,10 @@ function clearHandoff() {
 function showConfirmToast(jobData) {
   const existing = document.getElementById('job-tracker-toast');
   if (existing) existing.remove();
+
+  // Captured once, when the toast is created — this toast always belongs to
+  // whatever job is on screen right now.
+  const jobKey = getPageJobKey();
 
   // Guards this specific toast instance against a double-click firing two saves.
   let isSaving = false;
@@ -350,19 +385,20 @@ function showConfirmToast(jobData) {
     cancelBtn.disabled = true;
 
     try {
+      // eslint-disable-next-line no-undef
       chrome.runtime.sendMessage({ type: 'JOB_APPLY_DETECTED', job: jobData });
     } catch (e) {
       console.warn('Job Tracker: extension was reloaded — refresh this page and try again.');
     }
 
-    currentSession = { job: jobData, status: 'saved' };
+    sessionsByJobKey.set(jobKey, { job: jobData, status: 'saved' });
     clearHandoff();
     toast.remove();
   });
 
   cancelBtn.addEventListener('click', () => {
     if (isSaving) return;
-    currentSession = { job: jobData, status: 'dismissed' };
+    sessionsByJobKey.set(jobKey, { job: jobData, status: 'dismissed' });
     clearHandoff();
     toast.remove();
   });
@@ -428,7 +464,7 @@ async function checkHandoff() {
   }
 
   console.log('Job Tracker: handoff received from previous tab/page', handoff);
-  currentSession = { job: handoff.job, status: handoff.status };
+  sessionsByJobKey.set(getPageJobKey(), { job: handoff.job, status: handoff.status });
 
   if (handoff.status === 'pending' && handoff.job) {
     showConfirmToast(handoff.job);
@@ -449,12 +485,20 @@ document.addEventListener('click', (event) => {
 
   if (!isStart && !isContinue) return;
 
-  // Already have a result for this apply flow (captured earlier in this
-  // same script instance, or handed off from the previous page)?
-  // Don't re-extract from THIS page — later steps of a multi-step apply
-  // flow (review pages, submit buttons) have no real job data, and
-  // re-extracting there would silently overwrite a good earlier capture
-  // with a bad one, or spam a second "not recognized" toast.
+  // Session lookup is now per job (keyed by the URL's job ID), not global to
+  // the whole page — see sessionsByJobKey above for why. This means clicking
+  // Apply on a DIFFERENT job than the last one you saved/dismissed on this
+  // same page always starts fresh, rather than being silently blocked by a
+  // previous job's leftover status.
+  const jobKey = getPageJobKey();
+  const currentSession = sessionsByJobKey.get(jobKey);
+
+  // Already have a result for THIS job (captured earlier in this same script
+  // instance, or handed off from the previous page)? Don't re-extract from
+  // THIS page — later steps of a multi-step apply flow (review pages, submit
+  // buttons) have no real job data, and re-extracting there would silently
+  // overwrite a good earlier capture with a bad one, or spam a second
+  // "not recognized" toast.
   if (currentSession) {
     if (currentSession.status === 'pending') {
       // Re-show the existing good data instead of extracting again —
@@ -465,8 +509,9 @@ document.addEventListener('click', (event) => {
       }
       return;
     }
-    // 'saved', 'dismissed', or 'invalid' — this flow is already handled, ignore.
-    console.log('Job Tracker: click ignored, this apply flow is already', currentSession.status);
+    // 'saved', 'dismissed', or 'invalid' — this specific job is already
+    // handled, ignore. A different job (different key) is unaffected.
+    console.log('Job Tracker: click ignored, this job is already', currentSession.status);
     return;
   }
 
@@ -476,26 +521,28 @@ document.addEventListener('click', (event) => {
   // genuine START keyword (Apply, Easy Apply, etc.) may begin cold.
   if (!isStart) return;
 
-  // No session yet — this is the first apply-like click in a new flow.
+  // No session yet — this is the first apply-like click for this job.
   const jobData = extractJobData();
   console.log('Job Tracker: Apply click detected', jobData);
 
   if (!isValidExtraction(jobData)) {
     console.log('Job Tracker: extraction not trustworthy enough, showing not-recognized toast');
-    currentSession = { job: null, status: 'invalid' };
-    setHandoff(currentSession); // in case this click also navigates cross-origin
+    const invalidSession = { job: null, status: 'invalid' };
+    sessionsByJobKey.set(jobKey, invalidSession);
+    setHandoff(invalidSession); // in case this click also navigates cross-origin
     showNotRecognizedToast();
     return;
   }
 
-  currentSession = { job: jobData, status: 'pending' };
+  const pendingSession = { job: jobData, status: 'pending' };
+  sessionsByJobKey.set(jobKey, pendingSession);
   showConfirmToast(jobData);
 
   // Stash it too, ONLY in case this click causes a real cross-origin
   // navigation (e.g. indeed.com -> smartapply.indeed.com) that would wipe
-  // `currentSession` along with this whole script instance. If we stay on
-  // the same page/SPA instead, this just expires unused via HANDOFF_TTL_MS.
-  setHandoff(currentSession);
+  // this script instance entirely. If we stay on the same page/SPA instead,
+  // this just expires unused via HANDOFF_TTL_MS.
+  setHandoff(pendingSession);
 }, true); // capture phase — runs before the click's default action (e.g. navigation)
 
 // DEBUG HOOK — lets you manually test the toast + save pipeline from any page's console,
@@ -505,6 +552,8 @@ window.__jobTrackerTest = {
   showConfirmToast,
   showNotRecognizedToast,
   extractJobData,
-  getSession: () => currentSession
+  getPageJobKey,
+  getSession: () => sessionsByJobKey.get(getPageJobKey()),
+  getAllSessions: () => Object.fromEntries(sessionsByJobKey)
 };
 console.log('Job Tracker: content script loaded on', window.location.hostname);
