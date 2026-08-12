@@ -9,7 +9,10 @@ export function useJobs() {
   useEffect(() => {
 
     const fetchJobs = async () => {
-      const { data, error } = await supabase.from("jobs").select("*")
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .order("applied_at", { ascending: false })
       if (error) {
         console.error("Error fetching jobs:", error)
       } else {
@@ -37,7 +40,12 @@ export function useJobs() {
               // optimistically (see addJob below) before Realtime's event
               // for that same insert arrives a moment later.
               if (prev.some((job) => job.id === payload.new.id)) return prev
-              return [payload.new, ...prev]
+              // Re-sort rather than prepend, so the order stays identical
+              // to what a fresh page load would show (newest applied_at
+              // first) no matter when or how a row arrives.
+              return [...prev, payload.new].sort(
+                (a, b) => new Date(b.applied_at) - new Date(a.applied_at)
+              )
             })
           } else if (payload.eventType === 'UPDATE') {
             setJobs((prev) =>
@@ -130,8 +138,11 @@ export function useJobs() {
       return { error }
     }
 
-    // New entries go to the top so the just-added job is immediately visible.
-    setJobs((prev) => [data, ...prev])
+    // Re-sort rather than prepend, so the new job lands in the same spot it
+    // would land after a page reload — newest applied_at first, always.
+    setJobs((prev) =>
+      [...prev, data].sort((a, b) => new Date(b.applied_at) - new Date(a.applied_at))
+    )
     return { data }
   }
 
