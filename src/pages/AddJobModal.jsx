@@ -57,11 +57,11 @@ function AddJobModal({ onClose, onSave }) {
 
   return (
     <div
-      className="fixed inset-0 bg-night/50 dark:bg-black/70 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-night/50 dark:bg-black/70 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-6 w-full max-w-md"
+        className="bg-parchment dark:bg-night border border-border-light dark:border-border-dark rounded-md p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-ink dark:text-parchment text-lg font-semibold font-display tracking-wide mb-4">Add Job</h2>

@@ -7,7 +7,7 @@ export function useJobs() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  
+
     const fetchJobs = async () => {
       const { data, error } = await supabase.from("jobs").select("*")
       if (error) {
@@ -18,6 +18,41 @@ export function useJobs() {
       setLoading(false)
     }
     fetchJobs()
+
+    // Realtime subscription — pushes any change on the jobs table to every
+    // open tab instantly over a websocket, regardless of what made the
+    // change (this tab's own Add Job modal, the extension writing from a
+    // completely separate process, another browser tab, etc). RLS already
+    // restricts which rows a given user's connection can see, so this only
+    // ever delivers events for the logged-in user's own jobs.
+    const channel = supabase
+      .channel('jobs-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'jobs' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setJobs((prev) => {
+              // Avoid duplicating a row this same tab already added
+              // optimistically (see addJob below) before Realtime's event
+              // for that same insert arrives a moment later.
+              if (prev.some((job) => job.id === payload.new.id)) return prev
+              return [payload.new, ...prev]
+            })
+          } else if (payload.eventType === 'UPDATE') {
+            setJobs((prev) =>
+              prev.map((job) => (job.id === payload.new.id ? payload.new : job))
+            )
+          } else if (payload.eventType === 'DELETE') {
+            setJobs((prev) => prev.filter((job) => job.id !== payload.old.id))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
 
   }, [])
 
