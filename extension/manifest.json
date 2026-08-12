@@ -10,13 +10,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://job-tracker-sigma-indol.vercel.app/*"],
+      "matches": ["https://waypoint-now.vercel.app/*"],
       "js": ["auth-sync.js"],
       "run_at": "document_idle"
     },
     {
       "matches": ["<all_urls>"],
-      "exclude_matches": ["https://job-tracker-sigma-indol.vercel.app/*"],
+      "exclude_matches": ["https://waypoint-now.vercel.app/*"],
       "js": ["content.js"],
       "run_at": "document_idle",
       "all_frames": true
