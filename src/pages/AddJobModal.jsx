@@ -16,6 +16,28 @@ function todayDateString() {
   return `${yyyy}-${mm}-${dd}`
 }
 
+// Combines the user-picked date with the CURRENT time of day, rather than
+// defaulting to midnight UTC. Without this, every manually-added job on the
+// same date collapses to the exact same timestamp (midnight), which makes
+// same-day entries impossible to sort meaningfully relative to each other
+// or to extension-added jobs (which always get a precise real timestamp).
+// This keeps the date the user actually picked (so backdating still works)
+// while giving it a realistic, unique moment-of-entry.
+function buildAppliedAtTimestamp(dateString) {
+  const now = new Date()
+  const [year, month, day] = dateString.split("-").map(Number)
+  const combined = new Date(
+    year,
+    month - 1,
+    day,
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds(),
+    now.getMilliseconds()
+  )
+  return combined.toISOString()
+}
+
 function AddJobModal({ onClose, onSave }) {
   const [company, setCompany] = useState("")
   const [role, setRole] = useState("")
@@ -39,7 +61,7 @@ function AddJobModal({ onClose, onSave }) {
       role: role.trim(),
       status,
       url: url.trim(),
-      applied_at: new Date(appliedDate).toISOString(),
+      applied_at: buildAppliedAtTimestamp(appliedDate),
     })
 
     setSaving(false)
